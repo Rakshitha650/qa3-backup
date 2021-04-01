@@ -18,11 +18,7 @@
 
     <network>
         <join>
-            <kubernetes enabled="true">
-		 <namespace>default</namespace>
-                <service-name>service-hazelcast-server</service-name>
-		 <service-port>5701</service-port>
-	    </kubernetes>
+            <kubernetes enabled="true" />
             <multicast enabled="false"/>
             <tcp-ip enabled="false" />
           <!--  <discovery-strategies>
