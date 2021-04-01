@@ -10,6 +10,7 @@
         <property name="hazelcast.logging.type">slf4j</property>
         <property name="service-dns">service-hazelcast-server.default.svc.cluster.local</property>
 	<property name="hazelcast.network.join.kubernetes.service-dns">service-hazelcast-server.default.svc.cluster.local</property>
+	<property name="service-name">service-hazelcast-server</property>
     </properties>
 
     <network>
