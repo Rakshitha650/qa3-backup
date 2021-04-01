@@ -3,34 +3,52 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.hazelcast.com/schema/config
            http://www.hazelcast.com/schema/config/hazelcast-config-4.0.xsd">
-
     <cluster-name>dev</cluster-name>
-
-	 <properties>
-	   <property name="hazelcast.discovery.enabled">true</property>
-	   <property name="hazelcast.logging.type">slf4j</property>
-	 </properties>
+    <properties>
+        <property name="hazelcast.discovery.enabled">true</property>
+        <property name="hazelcast.logging.type">slf4j</property>
+        <property name="service-dns">service-hazelcast-server.default.svc.cluster.local</property>
+        <property name="hazelcast.network.join.kubernetes.service-dns">service-hazelcast-server.default.svc.cluster.local</property>
+        <property name="service-name">service-hazelcast-server</property>
+        <property name="service-port">5701</property>
+        <property name="hazelcast.network.join.kubernetes.service-port">5701</property>
+        <property name="hazelcast.network.join.kubernetes.service-name">service-hazelcast-server</property>
+    </properties>
     <network>
-	   <join>
-		 <multicast enabled="false"/>
-		 <tcp-ip enabled="false" />
-		 <discovery-strategies>
-		   <discovery-strategy enabled="true"
-			   class="com.hazelcast.kubernetes.HazelcastKubernetesDiscoveryStrategy">
-			 <properties>
-			   <property name="service-dns">service-hazelcast-server.default.svc.cluster.local</property>
-			 </properties>
-		   </discovery-strategy>
-		 </discovery-strategies>
-	   </join>
-	 </network>
-
+        <join>
+            <kubernetes enabled="true" />
+            <multicast enabled="false"/>
+            <tcp-ip enabled="false" />
+          <!--  <discovery-strategies>
+                <discovery-strategy enabled="true"
+                                    class="com.hazelcast.kubernetes.HazelcastKubernetesDiscoveryStrategy">
+                    <properties>
+                        <property name="service-dns">service-hazelcast-server.default.svc.cluster.local</property>
+                    </properties>
+                </discovery-strategy>
+            </discovery-strategies> -->
+        </join>
+    </network>
     <partition-group enabled="false"/>
     <executor-service name="default">
-        <pool-size>16</pool-size>
         <!--Queue capacity. 0 means Integer.MAX_VALUE.-->
-        <queue-capacity>1000</queue-capacity>
+        <queue-capacity>0</queue-capacity>
+        <pool-size>16</pool-size>
+        <statistics-enabled>true</statistics-enabled>
     </executor-service>
+    <durable-executor-service name="default">
+        <capacity>100</capacity>
+        <durability>1</durability>
+        <pool-size>16</pool-size>
+        <statistics-enabled>true</statistics-enabled>
+    </durable-executor-service>
+    <scheduled-executor-service name="default">
+        <capacity>100</capacity>
+        <durability>1</durability>
+        <pool-size>16</pool-size>
+        <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
+        <statistics-enabled>true</statistics-enabled>
+    </scheduled-executor-service>
     <security>
         <client-block-unmapped-actions>true</client-block-unmapped-actions>
     </security>
@@ -42,24 +60,21 @@
             Any integer between 0 and Integer.MAX_VALUE. 0 means
             Integer.MAX_VALUE. Default is 0.
         -->
-        <max-size>1000</max-size>
+        <max-size>0</max-size>
         <!--
             Number of backups. If 1 is set as the backup-count for example,
             then all entries of the map will be copied to another JVM for
             fail-safety. 0 means no backup.
         -->
         <backup-count>1</backup-count>
-
         <!--
             Number of async backups. 0 means no backup.
         -->
         <async-backup-count>0</async-backup-count>
-
         <empty-queue-ttl>-1</empty-queue-ttl>
-
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
     </queue>
-    <map name="packets">
+    <map name="default">
         <!--
            Data type that will be used for storing recordMap.
            Possible values:
@@ -68,7 +83,6 @@
            NATIVE : values will be stored in non-heap region of JVM
         -->
         <in-memory-format>OBJECT</in-memory-format>
-
         <!--
             Metadata creation policy for this map. Hazelcast may process objects of supported types ahead of time to
             create additional metadata about them. This metadata then is used to make querying and indexing faster.
@@ -78,7 +92,6 @@
             OFF: No metadata is created.
         -->
         <metadata-policy>CREATE_ON_UPDATE</metadata-policy>
-
         <!--
             Number of backups. If 1 is set as the backup-count for example,
             then all entries of the map will be copied to another JVM for
@@ -103,7 +116,6 @@
             Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0.
         -->
         <max-idle-seconds>300</max-idle-seconds>
-
         <eviction eviction-policy="LRU" max-size-policy="PER_NODE" size="0"/>
         <!--
             While recovering from split-brain (network partitioning),
@@ -113,7 +125,6 @@
             Values of these entries might be different for that same key.
             Which value should be set for the key? Conflict is resolved by
             the policy set here. Default policy is PutIfAbsentMapMergePolicy
-
             There are built-in merge policies such as
             com.hazelcast.spi.merge.PassThroughMergePolicy; entry will be overwritten if merging entry exists for the key.
             com.hazelcast.spi.merge.PutIfAbsentMergePolicy ; entry will be added if the merging entry doesn't exist in the cluster.
@@ -121,7 +132,6 @@
             com.hazelcast.spi.merge.LatestUpdateMergePolicy ; entry with the latest update wins.
         -->
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
-
         <!--
            Control caching of de-serialized values. Caching makes query evaluation faster, but it cost memory.
            Possible Values:
@@ -130,38 +140,31 @@
                         ALWAYS: Always cache deserialized values.
         -->
         <cache-deserialized-values>ALWAYS</cache-deserialized-values>
-
     </map>
-
-    <multimap name="packets">
+    <multimap name="default">
         <backup-count>1</backup-count>
         <value-collection-type>SET</value-collection-type>
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
     </multimap>
-
-    <replicatedmap name="packets">
+    <replicatedmap name="default">
         <in-memory-format>OBJECT</in-memory-format>
         <async-fillup>true</async-fillup>
         <statistics-enabled>true</statistics-enabled>
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
     </replicatedmap>
-
-    <list name="packets">
+    <list name="default">
         <backup-count>1</backup-count>
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
     </list>
-
-    <set name="packets">
+    <set name="default">
         <backup-count>1</backup-count>
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
     </set>
-
     <reliable-topic name="default">
         <read-batch-size>10</read-batch-size>
         <topic-overload-policy>BLOCK</topic-overload-policy>
         <statistics-enabled>true</statistics-enabled>
     </reliable-topic>
-
     <ringbuffer name="default">
         <capacity>10000</capacity>
         <backup-count>1</backup-count>
@@ -170,7 +173,6 @@
         <in-memory-format>BINARY</in-memory-format>
         <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
     </ringbuffer>
-
     <flake-id-generator name="default">
         <prefetch-count>100</prefetch-count>
         <prefetch-validity-millis>600000</prefetch-validity-millis>
@@ -181,36 +183,23 @@
         <allowed-future-millis>15000</allowed-future-millis>
         <statistics-enabled>true</statistics-enabled>
     </flake-id-generator>
-
     <serialization>
         <portable-version>0</portable-version>
     </serialization>
-
     <lite-member enabled="false"/>
-
     <cardinality-estimator name="default">
         <backup-count>1</backup-count>
         <async-backup-count>0</async-backup-count>
         <merge-policy batch-size="100">HyperLogLogMergePolicy</merge-policy>
     </cardinality-estimator>
-
-    <scheduled-executor-service name="default">
-        <capacity>100</capacity>
-        <durability>1</durability>
-        <pool-size>16</pool-size>
-        <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
-    </scheduled-executor-service>
-
     <crdt-replication>
         <replication-period-millis>1000</replication-period-millis>
         <max-concurrent-replication-targets>1</max-concurrent-replication-targets>
     </crdt-replication>
-
     <pn-counter name="default">
         <replica-count>2147483647</replica-count>
         <statistics-enabled>true</statistics-enabled>
     </pn-counter>
-
     <cp-subsystem>
         <cp-member-count>0</cp-member-count>
         <group-size>0</group-size>
@@ -228,7 +217,6 @@
             <append-request-backoff-timeout-in-millis>100</append-request-backoff-timeout-in-millis>
         </raft-algorithm>
     </cp-subsystem>
-
     <metrics enabled="true">
         <management-center enabled="true">
             <retention-seconds>5</retention-seconds>
@@ -236,5 +224,6 @@
         <jmx enabled="true"/>
         <collection-frequency-seconds>5</collection-frequency-seconds>
     </metrics>
+    <instance-tracking enabled="false">
+    </instance-tracking>
 </hazelcast>
-
