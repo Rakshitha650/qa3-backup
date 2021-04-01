@@ -11,6 +11,7 @@
         <property name="service-dns">service-hazelcast-server.default.svc.cluster.local</property>
 	<property name="hazelcast.network.join.kubernetes.service-dns">service-hazelcast-server.default.svc.cluster.local</property>
 	<property name="service-name">service-hazelcast-server</property>
+	<property name="service-port">5701</property>
     </properties>
 
     <network>
