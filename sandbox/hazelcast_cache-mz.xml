@@ -9,10 +9,6 @@
         <property name="hazelcast.logging.type">slf4j</property>
         <property name="service-dns">service-packetmanager-hazelcast-server.default.svc.cluster.local</property>
         <property name="hazelcast.network.join.kubernetes.service-dns">service-packetmanager-hazelcast-server.default.svc.cluster.local</property>
-        <property name="service-name">service-packetmanager-hazelcast-server</property>
-        <property name="service-port">5701</property>
-        <property name="hazelcast.network.join.kubernetes.service-port">5701</property>
-        <property name="hazelcast.network.join.kubernetes.service-name">service-packetmanager-hazelcast-server</property>
     </properties>
     <network>
         <join>
