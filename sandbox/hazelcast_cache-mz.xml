@@ -13,17 +13,9 @@
     </properties>
     <network>
         <join>
-          <!--  <kubernetes enabled="true" /> -->
+            <kubernetes enabled="true" />
             <multicast enabled="false"/>
             <tcp-ip enabled="false" />
-            <discovery-strategies>
-                <discovery-strategy enabled="true"
-                                    class="com.hazelcast.kubernetes.HazelcastKubernetesDiscoveryStrategy">
-                    <properties>
-                        <property name="service-dns">packetmanager-hazelcast-service.default.svc.cluster.local</property>
-                    </properties>
-                </discovery-strategy>
-            </discovery-strategies>
         </join>
     </network>
     <partition-group enabled="false"/>
