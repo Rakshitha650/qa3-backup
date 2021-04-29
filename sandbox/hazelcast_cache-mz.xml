@@ -52,7 +52,7 @@
                 <group-name>GROUP-NAME</group-name>
             </azure>
             <kubernetes enabled="true">
-		<namespace>packetmanager</namespace>
+                <namespace>packetmanager</namespace>
             </kubernetes>
             <eureka enabled="false">
                 <self-registration>true</self-registration>
